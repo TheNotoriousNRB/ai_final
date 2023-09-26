@@ -77,4 +77,14 @@ class SaboteurBaseEnvironment(GameEnvironment):
     
     def _path_connected(self):
         return False
+    
+    def is_empty(self, x, y):
+        return self._game_board[x][y] == None
+    
+    def is_adjacent_to_tunnel(self, x, y):
+        directions = [(0, 1), (1, 0), (0, -1), (-1,0)]
+        for dx, dy in directions:
+            if 0 <= x + dx < 20 and 0 <= y + dy < 20 and self._game_board[x + dx][y + dy] != None:
+                return True
+        return False
         
