@@ -87,17 +87,35 @@ class SaboteurPlayer(Agent):
             v[1] in {'1', '2', '3', '4', '5', '6', '7', '8'}
         )
 
+        self.add_actuator(
+            'turn-card-handler',
+            False,
+            lambda v: isinstance(v, bool)
+        )
+
     
     def add_all_actions(self):
         path_cards = ['cross-road', 'vertical-tunnel', 'horizontal-tunnel', 'vertical-junction', 'horizontal-junction', 'turn', 'dead-end', 'reverse-turn']
-        for i in range(path_cards):
-            self.add_action(
-                'use-path-card-{}'.format(i),
-                lambda i=i: self.release_action(i)
-            )
+        for i in range(len(path_cards)):
+            for x in range(19):
+                for y in range(19):
 
-            self.add_action(
-                'turn-path-card-{}'.format(i),
-                lambda i=i: self.turn_path_card(i)
-            )
+                    self.add_action(
+                    'use-path-card-{}-{}-{}'.format(i, x, y),
+                    lambda i=i, x=x, y=y: self.path_card_action(i, x, y)
 
+                    self.add_action(
+                    'turn-path-card-{}'.format(i, x, y),
+                    lambda i=i: self.turn_path_card(i)
+        )
+
+            ) 
+           
+
+    def path_card_action(self, i, x, y):
+        self._update_actuator_value('turn-card-handler', False)
+        return {'path-card-handler': [i, x, y]}
+
+    def turn_card_action(self, i, x, y):
+        self._update_actuator_value('turn-card-handler', True)
+        return {'path-card-handler': [i, x, y]}
