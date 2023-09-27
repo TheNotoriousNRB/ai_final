@@ -32,5 +32,7 @@ class SaboteurEnvironment(SaboteurBaseEnvironment):
     def is_terminal(game_state):
         if SaboteurEnvironment.get_winner(game_state) is not None:
             return True
+
+
     
     

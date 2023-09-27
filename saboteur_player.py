@@ -2,11 +2,15 @@ from une_ai.models import Agent
 from une_ai.models import GridMap
 from card import PathCard
 from card import ActionCard
+from deck import Deck
+from card import Card
 
 class SaboteurPlayer(Agent):
     game_board = GridMap(20,20,None)
-    path_cards = [PathCard.cross_road, PathCard.vertical_tunnel, PathCard.horizontal_tunnel, PathCard.vertical_junction, PathCard.horizontal_junction, PathCard.turn, PathCard.dead_end, PathCard.reversed_turn]
-    map_cards = [(14,8), (14,10), (14,12)]
+    card_deck = Deck._initialise_deck
+    starting_cards = [PathCard.cross_road(), PathCard.turn(), PathCard.horizontal_junction(), PathCard.vertical_junction()]
+    map_cards = [(14,6), (12,6), (10,6)]
+    path_cards = [PathCard.cross_road(), PathCard.vertical_tunnel(), PathCard.horizontal_tunnel(), PathCard.vertical_junction(), PathCard.horizontal_junction(), PathCard.turn, PathCard.reversed_turn()]
     special_cards = [(14,8), (14,10), (14,12), (6,10)]
 
     def __init__(self, agent_name, agent_program):
@@ -22,8 +26,7 @@ class SaboteurPlayer(Agent):
         self.add_sensor(
             'game-board-sensor',
             self.game_board,
-            lambda v: isinstance(v, GridMap) and
-            self.is_valid_game_board(v)
+            lambda v: isinstance(v, GridMap)
         )
 
         self.add_sensor(
@@ -33,23 +36,21 @@ class SaboteurPlayer(Agent):
         )
 
         self.add_sensor(
-            'hand-cards',
-            [],
+            'hand-cards-sensor',
+            self.starting_cards,
             lambda v: isinstance(v, list) and 
-            len(v) == 4 and 
-            all(isinstance(t, tuple) or isinstance(t, str) for t in v)
+            len(v) == 4
         )
     
     def add_all_actuators(self):
         self.add_actuator(
             'path-card-handler',
-            (PathCard.cross_road,(0,0)),
+            (PathCard.cross_road(),(0,0)),
             lambda v: isinstance(v, tuple) and 
             len(v) == 2 and
-            isinstance(v[0], str) and
-            v[0] in self.path_cards and
+            isinstance(v[0], PathCard) and
             isinstance(v[1], tuple) and
-            len(v[1] == 2) and
+            len(v[1]) == 2 and
             v[1][0] >= 0 and v[1][0] <= 19 and
             v[1][1] >=0 and v[1][1] <= 19
         )
@@ -59,26 +60,23 @@ class SaboteurPlayer(Agent):
             (ActionCard('map'),(0,0)),
             lambda v: isinstance(v, tuple) and 
             len(v) == 2 and
-            isinstance(v[0], str) and
             isinstance(v[0], ActionCard) and v[0].get_action() == 'map' and
             isinstance(v[1], tuple) and
-            len(v[1] == 2) and
+            len(v[1]) == 2 and
             v[1][0] >= 0 and v[1][0] <= 19 and
-            v[1][1] >=0 and v[1][1] <= 19 and
-            v[1] in self.map_cards
+            v[1][1] >=0 and v[1][1] <= 19
         )
 
         self.add_actuator(
             'dynamite-card-handler',
             (ActionCard('dynamite'), (0, 0)),
-            lambda v: isinstance(v, list) and
+            lambda v: isinstance(v, tuple) and
             len(v) == 2 and
             isinstance(v[0], ActionCard) and v[0].get_action() == 'dynamite' and 
             isinstance(v[1], tuple) and
-            len(v[1] == 2) and
+            len(v[1]) == 2 and
             v[1][0] >= 0 and v[1][0] <= 19 and
-            v[1][1] >=0 and v[1][1] <= 19 and
-            v[1] not in self.special_cards
+            v[1][1] >=0 and v[1][1] <= 19
         )
 
         self.add_actuator(
@@ -105,7 +103,7 @@ class SaboteurPlayer(Agent):
             'turn-card-handler',
             False,
             lambda v: isinstance(v, bool)
-         )
+        )
 
     
     def add_all_actions(self):

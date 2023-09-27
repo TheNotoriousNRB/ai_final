@@ -16,19 +16,21 @@ class SaboteurBaseEnvironment(GameEnvironment):
 
     def __init__(self):
         super().__init__("Saboteur Game Environment")
-        self._game_board = GameBoard.get_board()
+        game_b = GameBoard()
+        self._game_board = game_b.get_game_board()
         self._played_cards = None
         self._roles = ['Gold-Digger'] * 6 + ['Saboteur'] * 3
-        self._player_turn = random.choices(self._players.keys())
-        self._card_deck = Deck()._deck
-        self._total_cards = len(self._card_deck)
+        random.shuffle(self._roles)
+        self._player_turn = '1'
+        self._card_deck = Deck()
 
     
     def add_player(self, player):
         assert len(self._players) < 8, "It is not possible to add more than 8 players, in the game"
-
+        sabo_player = len(self._players) + 1
         _player_cards = self.initialize_player_cards() #getting starting cards for each player
-        self._players[player] = (self._roles.pop(random.choice(self._roles)), _player_cards) #adding player with playerId, playerRole and starting cards
+        random_role = self._roles.pop()
+        self._players[str(sabo_player)] = (random_role, _player_cards) #playerRole and starting cards
         return player
     
     def get_hand_cards(self):
@@ -39,7 +41,6 @@ class SaboteurBaseEnvironment(GameEnvironment):
             'game-board': self._game_board.copy(),
             'player-turn': self._player_turn,
             'player-hand-card': self.get_hand_cards(),
-            'card-deck': self._card_deck
         }
         return game_state
 
@@ -66,7 +67,7 @@ class SaboteurBaseEnvironment(GameEnvironment):
         return {
             'game-board-sensor': game_state['game-board'],
             'turn-taking-indicator': self._player_turn,
-            'hand-cards': self.get_hand_cards()
+            'hand-cards': self.get_hand_cards(),
         }
     
     def transition_result(game_state, action):
@@ -87,4 +88,11 @@ class SaboteurBaseEnvironment(GameEnvironment):
             if 0 <= x + dx < 20 and 0 <= y + dy < 20 and self._game_board[x + dx][y + dy] != None:
                 return True
         return False
+    
+    def state_transition(self, agent_actuators):
+        pass
+
+    def payoff(game_state, player_name):
+        pass
+
         

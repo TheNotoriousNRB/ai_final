@@ -25,6 +25,9 @@ class GameBoard():
     def get_board(self):
         return self._board.get_map()
     
+    def get_game_board(self):
+        return self._board.copy()
+    
     # TODO
     # This method does not check if there is a valid path from
     # the starting card to the new placed card
