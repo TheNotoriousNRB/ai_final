@@ -146,6 +146,19 @@ class PathCard(Card):
     def get_tunnels(self):
         return self._tunnels.copy()
     
+    def is_cross_road(self):
+    # check if the card is a cross_road type
+    # Here, I am assuming the distinguishing feature is the list of tunnels. Adjust accordingly.
+        tunnels = [
+            ('north', 'south'),
+            ('north', 'east'),
+            ('north', 'west'),
+            ('south', 'east'),
+            ('south', 'west'),
+            ('east', 'west')
+        ]
+        return set(self._tunnels) == set(tunnels)
+    
     def __str__(self):
         card_rep = ['   ', '   ', '   ']
         if self._revealed:

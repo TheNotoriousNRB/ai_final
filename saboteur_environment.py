@@ -8,8 +8,8 @@ class SaboteurEnvironment(SaboteurBaseEnvironment):
 
     def get_legal_actions(game_state):
         legal_actions = []
-        game_board = game_state['game-board']
-        player_turn = SaboteurBaseEnvironment.turn(game_state)
+        #game_board = game_state['game-board']
+        #player_turn = SaboteurBaseEnvironment.turn(game_state)
         player_card = SaboteurBaseEnvironment.get_hand_cards()
 
         for x in range(20):
@@ -19,6 +19,7 @@ class SaboteurEnvironment(SaboteurBaseEnvironment):
                         if isinstance(card, PathCard):
                             legal_actions.append(f'use-path-card-{card}-{x}-{y}')
 
+        print(legal_actions)
         return legal_actions
     
     def get_winner(game_state):

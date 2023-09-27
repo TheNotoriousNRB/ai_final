@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 import os
+from card import PathCard
 
 BLACK = (30, 30, 30)
 WHITE = (255, 255, 255)
@@ -24,8 +25,10 @@ class SaboteurGame:
         pygame.display.set_caption('Saboteur')
         window_clock = pygame.time.Clock()
 
-        self._card_image = pygame.image.load(os.path.join('images', 'cross-road.png'))
-        self._scaled_card_image = pygame.transform.scale(self._card_image, (20, 20))
+        self._card_image = pygame.image.load(os.path.join('images/', 'cross-road.png'))
+        self._scaled_card_image = pygame.transform.scale(self._card_image, (40, 40))
+        self._start_card = PathCard.cross_road(special_card='start')
+
 
 
         self._display = window
@@ -74,16 +77,16 @@ class SaboteurGame:
         self._display.blit(text, (DISPLAY_WIDTH/2 - len(text_message), 20))
     
     def _draw_box(self, x, y, card):
-        image = None
-        if card == '┼':
-            image = self._scaled_card_image
-
         card_color = WHITE 
-
         x_coord = x * self._box_size
         y_coord = y * self._box_size
-        
-        self._display.blit(image, (x_coord, y_coord))
+        image = None
+        if card.is_cross_road():
+            image = self._scaled_card_image
+            self._display.blit(image, (x_coord, y_coord))
+        else:
+            pygame.draw.rect(self._display, card_color, pygame.Rect(x_coord, y_coord, self._box_size, self._box_size))
+
 
     def _draw_board(self):
         game_state = self._environment.get_game_state()
@@ -92,6 +95,7 @@ class SaboteurGame:
             for x in range(self._n_cols):
                 card = game_board.get_item_value(x, y)
                 if card:
+                    self._environment.get_legal_actions()
                     self._draw_box(x, y, card)
 
     
